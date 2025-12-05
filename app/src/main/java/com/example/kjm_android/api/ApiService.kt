@@ -13,16 +13,16 @@ interface ApiService {
     suspend fun login(@Body request: LoginRequest): Response<User>
 
     @GET("api/usuarios")
-    suspend fun getUsers(): Response<List<User>> 
+    suspend fun getUsers(): Response<List<User>>
 
     @GET("api/usuarios/{id}")
-    suspend fun getUserById(@Path("id") userId: Long): Response<User> // Corrected: Int -> Long
+    suspend fun getUserById(@Path("id") userId: Long): Response<User>
 
     @POST("api/usuarios")
     suspend fun createUser(@Body user: User): Response<User>
 
     @PUT("api/usuarios/{id}")
-    suspend fun updateUser(@Path("id") userId: Long, @Body user: User): Response<User> // Corrected: Int -> Long
+    suspend fun updateUser(@Path("id") userId: Long, @Body user: User): Response<User>
 
     @DELETE("api/usuarios/{id}")
     suspend fun deleteUser(@Path("id") userId: Long): Response<Void>
@@ -57,7 +57,8 @@ interface ApiService {
 
 // Singleton object
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:8080/"
+    // --- URL UPDATED TO YOUR CORRECT WIFI IP ADDRESS ---
+    private const val BASE_URL = "http://192.168.1.6:8080/"
 
     val instance: ApiService by lazy {
         val retrofit = Retrofit.Builder()
