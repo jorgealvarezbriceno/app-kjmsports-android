@@ -2,6 +2,7 @@ package com.example.kjm_android
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,9 +25,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -45,8 +45,6 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, produ
     val user by userViewModel.user.collectAsState()
     val productState by productViewModel.productState.collectAsState()
     val cartState by cartViewModel.cartState.collectAsState()
-
-    val categoryIdMap = mapOf("Fútbol" to 1L, "Natación" to 2L, "Boxeo" to 3L, "Ciclismo" to 4L)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -95,12 +93,22 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, produ
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item { Spacer(modifier = Modifier.height(16.dp)) }
+
+                item {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Logo de KJMSports",
+                        modifier = Modifier.height(200.dp)
+                    )
+                }
+
                 item { Button(onClick = { navController.navigate("about") }, modifier = Modifier.fillMaxWidth()) { Text("Quiénes Somos", fontSize = 16.sp) } }
                 item { Text("Categorias", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color.White) }
                 item { Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) { CategoryItem("Fútbol", "https://img.freepik.com/foto-gratis/jugadores-futbol-accion-estadio-profesional_654080-1746.jpg?semt=ais_hybrid&w=740&q=80", Modifier.weight(1f)) { navController.navigate("category/1/Fútbol") }; CategoryItem("Natación", "https://www.elisaribau.com/wp-content/uploads/2018/03/deporte2.jpg", Modifier.weight(1f)) { navController.navigate("category/2/Natación") } } }
                 item { Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) { CategoryItem("Boxeo", "https://img.freepik.com/foto-gratis/dos-boxeadores-musculosos-compiten-ring-llevan-cascos-guantes_613910-13128.jpg?semt=ais_hybrid&w=740&q=80", Modifier.weight(1f)) { navController.navigate("category/3/Boxeo") }; CategoryItem("Ciclismo", "https://hips.hearstapps.com/hmg-prod/images/gettyimages-102285244-1658233993.jpg?resize=980:*", Modifier.weight(1f)) { navController.navigate("category/4/Ciclismo") } } }
                 item { Text("Vive el deporte", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color.White) }
                 item {
+                    // --- THIS LIST IS NOW RESTORED ---
                     val sliderImages = listOf("https://entrenadorpersonaloriol.com/wp-content/uploads/2024/03/Par-de-guantes-para-boxeo-equipamiento-de-boxeo-para-entrenar-con-un-entrenador-de-boxeo-1024x683.jpg", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHFOUsdRQv55xNr8yq_ceQgtApBHc8FHphKQ&s", "https://static.vecteezy.com/system/resources/thumbnails/027/829/024/small/close-up-of-many-soccer-players-kicking-a-football-on-a-field-competition-scene-created-with-generative-ai-technology-photo.jpg")
                     val pagerState = rememberPagerState(pageCount = { sliderImages.size })
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -123,7 +131,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, produ
                     is ProductState.Error -> {
                         item { Text(state.message, color = Color.White) }
                     }
-                    else -> { /* Exhaustive when */ }
+                    is ProductState.Deleted -> { /* No action needed on home screen */ }
                 }
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
