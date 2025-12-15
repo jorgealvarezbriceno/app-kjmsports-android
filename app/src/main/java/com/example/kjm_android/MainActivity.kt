@@ -56,10 +56,12 @@ fun AppNavigation() {
         composable("admin_users") { AdminUserListScreen(navController) }
         composable("admin_categories") { AdminCategoryScreen(navController) }
 
-        // --- REPORT ROUTES ---
         composable("report_low_stock") { LowStockScreen(navController, productViewModel) }
         composable("report_top_selling") { TopSellingScreen(navController) }
         composable("report_category_inventory") { CategoryInventoryScreen(navController, productViewModel, categoryViewModel) }
+        
+        // --- Route restored to its final version ---
+        composable("sales_history") { SalesHistoryScreen(navController) }
         
         composable(
             route = "add_edit_product?productId={productId}",

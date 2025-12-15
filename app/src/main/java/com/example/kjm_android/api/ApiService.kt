@@ -48,12 +48,12 @@ interface ApiService {
     @DELETE("api/productos/{id}")
     suspend fun deleteProduct(@Path("id") productId: Long): Response<Void>
 
-    // --- NEW REPORT ENDPOINTS ---
+    // Reports
     @GET("api/productos/low-stock")
     suspend fun getLowStockProducts(): Response<List<Product>>
 
     @GET("api/productos/top-selling")
-    suspend fun getTopSellingProducts(): Response<List<Product>> // Assuming this endpoint exists
+    suspend fun getTopSellingProducts(): Response<List<Product>>
 
     // Categories
     @GET("api/categorias")
@@ -68,9 +68,12 @@ interface ApiService {
     @DELETE("api/categorias/{id}")
     suspend fun deleteCategory(@Path("id") categoryId: Long): Response<Void>
 
-    // Orders
+    // Orders (Boletas)
     @POST("api/boletas")
     suspend fun createBoleta(@Body boletaRequest: ApiBoleta): Response<Void>
+
+    @GET("api/boletas") // <-- NEW ENDPOINT
+    suspend fun getBoletas(): Response<List<Boleta>>
 }
 
 // Singleton object
