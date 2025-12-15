@@ -8,11 +8,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,9 +36,13 @@ import java.util.Locale
 fun ProductListScreen(navController: NavController, productViewModel: ProductViewModel, cartViewModel: CartViewModel) {
     val state by productViewModel.productState.collectAsState()
     val cartState by cartViewModel.cartState.collectAsState()
+    
+    // --- Using state from ViewModel for search ---
+    val searchQuery by productViewModel.searchQuery
+    val filteredProducts by productViewModel.filteredProducts.collectAsState()
 
     Scaffold(
-        containerColor = Color(0xFF212121), // Dark background color
+        containerColor = Color(0xFF212121),
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF1C1C1C), titleContentColor = Color.White, navigationIconContentColor = Color.White, actionIconContentColor = Color.White),
@@ -50,7 +53,7 @@ fun ProductListScreen(navController: NavController, productViewModel: ProductVie
                     }
                 },
                 actions = {
-                    BadgedBox(badge = { Badge { Text("${cartState.totalItems}") } }) {
+                    BadgedBox(badge = { if(cartState.totalItems > 0) Badge { Text("${cartState.totalItems}") } }) {
                         IconButton(onClick = { navController.navigate("cart") }) {
                             Icon(Icons.Filled.ShoppingCart, contentDescription = "Carrito")
                         }
@@ -59,32 +62,54 @@ fun ProductListScreen(navController: NavController, productViewModel: ProductVie
             )
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-            when (val currentState = state) {
-                is ProductState.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is ProductState.Success -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(currentState.products) { product ->
-                            ProductCard(product = product, onAddToCart = { cartViewModel.addProduct(it) })
+        Column(modifier = Modifier.padding(innerPadding)) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { productViewModel.onSearchQueryChange(it) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                label = { Text("Buscar producto...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = Color.Gray,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    cursorColor = Color.White
+                )
+            )
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                when (state) {
+                    is ProductState.Loading -> {
+                        CircularProgressIndicator()
+                    }
+                    is ProductState.Success -> {
+                        if (filteredProducts.isEmpty() && searchQuery.isNotEmpty()) {
+                            Text(text = "No se encontraron productos.", color = Color.White)
+                        } else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(filteredProducts) { product ->
+                                    ProductCard(product = product, onAddToCart = { cartViewModel.addProduct(it) })
+                                }
+                            }
                         }
                     }
+                    is ProductState.Error -> {
+                        Text(text = (state as ProductState.Error).message, color = Color.White)
+                    }
+                    is ProductState.Deleted -> { /* No action needed */ }
                 }
-                is ProductState.Error -> {
-                    Text(text = currentState.message, color = Color.White)
-                }
-                else -> { /* Exhaustive when */ }
             }
         }
     }

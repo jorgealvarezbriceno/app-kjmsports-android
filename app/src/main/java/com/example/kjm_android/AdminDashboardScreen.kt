@@ -3,6 +3,7 @@ package com.example.kjm_android
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material3.*
@@ -53,6 +54,11 @@ fun AdminDashboardScreen(navController: NavController) {
                 title = "Gestionar Usuarios",
                 icon = Icons.Default.Group,
                 onClick = { navController.navigate("admin_users") }
+            )
+            AdminCard(
+                title = "Gestionar Categorías",
+                icon = Icons.Default.Category,
+                onClick = { navController.navigate("admin_categories") }
             )
         }
     }

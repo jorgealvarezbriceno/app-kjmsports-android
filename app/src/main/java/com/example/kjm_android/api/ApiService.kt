@@ -1,6 +1,8 @@
 package com.example.kjm_android.api
 
 import com.example.kjm_android.data.* 
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -49,6 +51,15 @@ interface ApiService {
     // Categories
     @GET("api/categorias")
     suspend fun getCategories(): Response<List<Category>>
+    
+    @POST("api/categorias")
+    suspend fun createCategory(@Body category: Category): Response<Category>
+
+    @PUT("api/categorias/{id}")
+    suspend fun updateCategory(@Path("id") categoryId: Long, @Body category: Category): Response<Category>
+
+    @DELETE("api/categorias/{id}")
+    suspend fun deleteCategory(@Path("id") categoryId: Long): Response<Void>
 
     // Orders
     @POST("api/boletas")
@@ -57,13 +68,21 @@ interface ApiService {
 
 // Singleton object
 object ApiClient {
-    // --- URL UPDATED TO YOUR CORRECT WIFI IP ADDRESS ---
     private const val BASE_URL = "http://192.168.1.6:8080/"
 
     val instance: ApiService by lazy {
+        // Create a logging interceptor
+        val logging = HttpLoggingInterceptor()
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+
+        // Create a custom OkHttpClient and add the interceptor
+        val httpClient = OkHttpClient.Builder()
+        httpClient.addInterceptor(logging)
+
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(httpClient.build()) // Use the custom client
             .build()
         retrofit.create(ApiService::class.java)
     }

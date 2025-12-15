@@ -11,7 +11,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.kjm_android.ui.theme.KJMANDROIDTheme
+import com.example.kjm_android.viewmodel.AdminCategoryViewModel
 import com.example.kjm_android.viewmodel.CartViewModel
+import com.example.kjm_android.viewmodel.CategoryViewModel
 import com.example.kjm_android.viewmodel.ProductViewModel
 import com.example.kjm_android.viewmodel.UserViewModel
 
@@ -32,10 +34,11 @@ fun AppNavigation() {
     val userViewModel: UserViewModel = viewModel()
     val productViewModel: ProductViewModel = viewModel()
     val cartViewModel: CartViewModel = viewModel()
+    val categoryViewModel: CategoryViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginScreen(navController, userViewModel = userViewModel) }
-        composable("home") { HomeScreen(navController, userViewModel = userViewModel, productViewModel = productViewModel, cartViewModel = cartViewModel) }
+        composable("home") { HomeScreen(navController, userViewModel = userViewModel, productViewModel = productViewModel, cartViewModel = cartViewModel, categoryViewModel = categoryViewModel) }
         composable("products") { ProductListScreen(navController, productViewModel = productViewModel, cartViewModel = cartViewModel) }
         composable(
             route = "category/{categoryId}/{categoryName}",
@@ -55,20 +58,19 @@ fun AppNavigation() {
         composable("admin") { AdminDashboardScreen(navController) }
         composable("admin_products") { AdminProductListScreen(navController, productViewModel = productViewModel) }
         composable("admin_users") { AdminUserListScreen(navController) }
+        composable("admin_categories") { AdminCategoryScreen(navController) } 
         
-        // ROUTE FOR ADD/EDIT PRODUCT
         composable(
             route = "add_edit_product?productId={productId}",
             arguments = listOf(navArgument("productId") { 
                 type = NavType.LongType
-                defaultValue = 0L // Default to 0 if no ID is passed (Create mode)
+                defaultValue = 0L
             })
         ) {
             val productId = it.arguments?.getLong("productId")
             AddEditProductScreen(navController, productId = productId)
         }
 
-        // ROUTE FOR ADD/EDIT USER
         composable(
             route = "add_edit_user?userId={userId}",
             arguments = listOf(navArgument("userId") { 
