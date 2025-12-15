@@ -11,11 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.kjm_android.ui.theme.KJMANDROIDTheme
-import com.example.kjm_android.viewmodel.AdminCategoryViewModel
-import com.example.kjm_android.viewmodel.CartViewModel
-import com.example.kjm_android.viewmodel.CategoryViewModel
-import com.example.kjm_android.viewmodel.ProductViewModel
-import com.example.kjm_android.viewmodel.UserViewModel
+import com.example.kjm_android.viewmodel.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +34,8 @@ fun AppNavigation() {
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginScreen(navController, userViewModel = userViewModel) }
-        composable("home") { HomeScreen(navController, userViewModel = userViewModel, productViewModel = productViewModel, cartViewModel = cartViewModel, categoryViewModel = categoryViewModel) }
-        composable("products") { ProductListScreen(navController, productViewModel = productViewModel, cartViewModel = cartViewModel) }
+        composable("home") { HomeScreen(navController, userViewModel, productViewModel, cartViewModel, categoryViewModel) }
+        composable("products") { ProductListScreen(navController, productViewModel, cartViewModel) }
         composable(
             route = "category/{categoryId}/{categoryName}",
             arguments = listOf(
@@ -49,16 +45,21 @@ fun AppNavigation() {
         ) {
             val categoryId = it.arguments?.getLong("categoryId") ?: 0L
             val categoryName = it.arguments?.getString("categoryName") ?: ""
-            CategoryProductScreen(navController, categoryId = categoryId, categoryName = categoryName, cartViewModel = cartViewModel)
+            CategoryProductScreen(navController, categoryId, categoryName, cartViewModel)
         }
-        composable("cart") { CartScreen(navController, cartViewModel = cartViewModel) }
-        composable("checkout") { CheckoutScreen(navController, cartViewModel = cartViewModel) }
-        composable("payment") { PaymentScreen(navController, cartViewModel = cartViewModel, userViewModel = userViewModel) }
+        composable("cart") { CartScreen(navController, cartViewModel) }
+        composable("checkout") { CheckoutScreen(navController, cartViewModel) }
+        composable("payment") { PaymentScreen(navController, cartViewModel, userViewModel) }
         composable("about") { AboutUsScreen(navController) }
         composable("admin") { AdminDashboardScreen(navController) }
-        composable("admin_products") { AdminProductListScreen(navController, productViewModel = productViewModel) }
+        composable("admin_products") { AdminProductListScreen(navController, productViewModel) }
         composable("admin_users") { AdminUserListScreen(navController) }
-        composable("admin_categories") { AdminCategoryScreen(navController) } 
+        composable("admin_categories") { AdminCategoryScreen(navController) }
+
+        // --- REPORT ROUTES ---
+        composable("report_low_stock") { LowStockScreen(navController, productViewModel) }
+        composable("report_top_selling") { TopSellingScreen(navController) }
+        composable("report_category_inventory") { CategoryInventoryScreen(navController, productViewModel, categoryViewModel) }
         
         composable(
             route = "add_edit_product?productId={productId}",
@@ -68,7 +69,7 @@ fun AppNavigation() {
             })
         ) {
             val productId = it.arguments?.getLong("productId")
-            AddEditProductScreen(navController, productId = productId)
+            AddEditProductScreen(navController, productId)
         }
 
         composable(
@@ -79,7 +80,7 @@ fun AppNavigation() {
             })
         ) {
             val userId = it.arguments?.getString("userId")
-            AddEditUserScreen(navController, userId = userId)
+            AddEditUserScreen(navController, userId)
         }
     }
 }

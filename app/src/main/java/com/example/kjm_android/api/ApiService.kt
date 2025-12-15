@@ -48,6 +48,13 @@ interface ApiService {
     @DELETE("api/productos/{id}")
     suspend fun deleteProduct(@Path("id") productId: Long): Response<Void>
 
+    // --- NEW REPORT ENDPOINTS ---
+    @GET("api/productos/low-stock")
+    suspend fun getLowStockProducts(): Response<List<Product>>
+
+    @GET("api/productos/top-selling")
+    suspend fun getTopSellingProducts(): Response<List<Product>> // Assuming this endpoint exists
+
     // Categories
     @GET("api/categorias")
     suspend fun getCategories(): Response<List<Category>>
@@ -71,18 +78,16 @@ object ApiClient {
     private const val BASE_URL = "http://192.168.1.6:8080/"
 
     val instance: ApiService by lazy {
-        // Create a logging interceptor
         val logging = HttpLoggingInterceptor()
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        // Create a custom OkHttpClient and add the interceptor
         val httpClient = OkHttpClient.Builder()
         httpClient.addInterceptor(logging)
 
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(httpClient.build()) // Use the custom client
+            .client(httpClient.build())
             .build()
         retrofit.create(ApiService::class.java)
     }
