@@ -1,6 +1,6 @@
 package com.example.kjm_android.api
 
-import com.example.kjm_android.data.* 
+import com.example.kjm_android.data.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -72,13 +72,15 @@ interface ApiService {
     @POST("api/boletas")
     suspend fun createBoleta(@Body boletaRequest: ApiBoleta): Response<Void>
 
-    @GET("api/boletas") // <-- NEW ENDPOINT
+    @GET("api/boletas") 
     suspend fun getBoletas(): Response<List<Boleta>>
 }
 
 // Singleton object
 object ApiClient {
-    private const val BASE_URL = "http://192.168.1.6:8080/"
+
+    // --- POINTING BACK TO PUBLIC RAILWAY URL ---
+    private const val BASE_URL = "https://api-kjmsports-production.up.railway.app"
 
     val instance: ApiService by lazy {
         val logging = HttpLoggingInterceptor()
